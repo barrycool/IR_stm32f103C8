@@ -317,7 +317,8 @@ void IR_respon_CMD_list_loop(void)
   }
 }
 
-uint8_t ir_send_status_flag = 1;
+volatile uint8_t ir_send_status_flag = 1;
+volatile uint8_t ir_learning_status = 1;
 uint8_t ir_index;
 void IR_loop(void)
 { 
@@ -348,7 +349,7 @@ void IR_loop(void)
     return;
   }
   
-  if (ir_send_status_flag && IR_CMD_list[ir_index].is_valid == 0x01)
+  if (ir_send_status_flag && ir_learning_status && IR_CMD_list[ir_index].is_valid == 0x01)
   { 
     IR_send_command(&IR_CMD_list[ir_index]);
     IR_delay_ms_cnt = IR_CMD_list[ir_index].delay_time;
@@ -401,6 +402,16 @@ void IR_send_next_CMD(void)
     respon_cmd_list_data.flag = 1;
     respon_cmd_list_data.index++;
   }
+}
+
+void IR_stop_learning(void)
+{
+  ir_learning_status = 1;
+}
+
+void IR_start_learning(void)
+{
+  ir_learning_status = 0;
 }
 
 void IR_pause_send(void)

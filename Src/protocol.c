@@ -134,13 +134,13 @@ void cmd_handle(uint8_t *buf, uint8_t buf_len)
   }
   else if  (frame->msg_id == START_LEARNING)
   {
-    IR_pause_send();
+    IR_start_learning();
     IR_RX_enable();
   }
   else if  (frame->msg_id == STOP_LEARNING)
   {
     IR_RX_disable();
-    IR_start_send();
+    IR_stop_learning();
   }
   else if (frame->msg_id == ACK)
   {

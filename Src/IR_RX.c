@@ -69,7 +69,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     
     //IR_RX_flag = 1;
     report_receive_ir(waveform, WF_index);
-    
+    IR_stop_learning();
   }
   
   state = START;

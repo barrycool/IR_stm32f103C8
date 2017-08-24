@@ -60,5 +60,7 @@ void IR_send_CMD_list(void);
 void IR_send_next_CMD(void);
 void IR_pause_send(void);
 void IR_start_send(void);
+void IR_stop_learning(void);
+void IR_start_learning(void);
 
 #endif
