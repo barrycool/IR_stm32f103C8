@@ -160,7 +160,7 @@ void cmd_handle(uint8_t *buf, uint8_t buf_len)
   }
   else if (frame->msg_id == UPGRADE_PACKET)
   {
-    if (!upgrade_recv_packet(frame->msg_parameter[0], &frame->msg_parameter[1], PACKET_MAX_SIZE))
+    if (!upgrade_recv_packet(*(uint16_t*)frame->msg_parameter, &frame->msg_parameter[2], PACKET_MAX_SIZE))
     {
       nack_msg(frame->seq_num, frame->msg_id);
       return;
@@ -168,7 +168,7 @@ void cmd_handle(uint8_t *buf, uint8_t buf_len)
   }
   else if (frame->msg_id == UPGRADE_FINISH)
   {
-    if (upgrade_finish(*(uint32_t*)frame->msg_parameter, *(uint32_t*)(frame->msg_parameter + 4)))
+    if (upgrade_finish())
     {
       nack_msg(frame->seq_num, frame->msg_id);
       return;

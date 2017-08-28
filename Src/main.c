@@ -58,6 +58,7 @@
 #include "protocol.h"
 #include "IR_RX.h"
 #include "upgrade.h"
+#include "eeprom.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -83,7 +84,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  //SCB->VTOR = APP_ADDR;
+  SCB->VTOR = APP_ADDR;
 
   /* USER CODE END 1 */
 
@@ -123,6 +124,7 @@ int main(void)
   {
     IR_loop();
     protocol_loop();
+    eeprom_loop();
 
   /* USER CODE END WHILE */
 

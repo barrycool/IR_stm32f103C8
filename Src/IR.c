@@ -11,6 +11,7 @@
 #include "IR_RC5.h"
 #include "IR_JVC.h"
 #include "IR_learning.h"
+#include "eeprom.h"
 
 #define TX_TIMER htim3
 
@@ -18,7 +19,6 @@ volatile uint8_t IR_is_sending_flag;
 volatile uint32_t IR_delay_ms_cnt;
 volatile uint16_t IR_interval_ms_cnt;
 
-#define IR_BUFFER_LEN 20
 struct IR_item_t IR_living_CMD;
 
 //IR TX
@@ -44,93 +44,6 @@ struct IR_item_t IR_CMD_list[IR_BUFFER_LEN] = {
 #endif
   
 };
-
-uint8_t flash_flag;
-uint32_t flash_timer_cnt;
-#define FLASH_ADDR1 (FLASH_BASE + 60 * FLASH_PAGE_SIZE)
-#define FLASH_ADDR2 (FLASH_ADDR1 + FLASH_PAGE_SIZE)
-
-void flash_write_data(uint32_t flash_addr, uint32_t *buf, uint16_t buf_len)
-{
-  uint16_t i;
-  
-  for (i = 0; i < buf_len; i++)
-  {  
-    HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, flash_addr + i * 4, buf[i]);
-  }
-}
-
-extern void    FLASH_PageErase(uint32_t PageAddress);
-
-void IR_save_to_flash(void)
-{
-  uint32_t *flash1_flag = (uint32_t *)FLASH_ADDR1;
-  uint32_t *flash2_flag = (uint32_t *)FLASH_ADDR2;
-  
-  FLASH_EraseInitTypeDef def;
-  uint32_t PageError;
-  
-  def.TypeErase = FLASH_TYPEERASE_PAGES;
-  def.NbPages = 1;
-  def.Banks = FLASH_BANK_1;
-  
-  __set_PRIMASK(1);
-  
-  __HAL_RCC_HSI_ENABLE();
-  HAL_FLASH_Unlock();
-  
-  __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_OPTVERR);
-  __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_WRPERR | FLASH_FLAG_PGERR);
-  
-  if (*flash1_flag != 0xFFFFFFFF && *flash2_flag == 0xFFFFFFFF)
-  {
-    def.PageAddress = FLASH_ADDR1;
-    HAL_FLASHEx_Erase(&def, &PageError);
-    //FLASH_PageErase(FLASH_ADDR1);
-    
-    flash_write_data(FLASH_ADDR2, (uint32_t*)IR_CMD_list, sizeof(IR_CMD_list) / 4);
-  }
-  else if (*flash1_flag == 0xFFFFFFFF && *flash2_flag != 0xFFFFFFFF)
-  {
-    //FLASH_PageErase(FLASH_ADDR2);
-    
-    def.PageAddress = FLASH_ADDR2;
-    flash_write_data(FLASH_ADDR1, (uint32_t*)IR_CMD_list, sizeof(IR_CMD_list) / 4);
-  }
-  else
-  {
-    def.PageAddress = FLASH_ADDR1;
-    HAL_FLASHEx_Erase(&def, &PageError);
-    
-    def.PageAddress = FLASH_ADDR2;
-    HAL_FLASHEx_Erase(&def, &PageError);
-    
-    //FLASH_PageErase(FLASH_ADDR1);
-    //FLASH_PageErase(FLASH_ADDR2);
-    
-    flash_write_data(FLASH_ADDR1, (uint32_t*)IR_CMD_list, sizeof(IR_CMD_list) / 4);
-  }
-  
-  HAL_FLASH_Lock();
-  __HAL_RCC_HSI_DISABLE();
-  
-  __set_PRIMASK(0);
-}
-
-void IR_read_from_flash(void)
-{
-  uint32_t *flash1_flag = (uint32_t *)FLASH_ADDR1;
-  uint32_t *flash2_flag = (uint32_t *)FLASH_ADDR2;
-  
-  if (*flash1_flag == 0xFFFFFFFF && *flash2_flag != 0xFFFFFFFF)
-  {
-    memcpy(IR_CMD_list, (uint8_t*)FLASH_ADDR2, sizeof(IR_CMD_list));
-  }
-  else
-  {
-    memcpy(IR_CMD_list, (uint8_t*)FLASH_ADDR1, sizeof(IR_CMD_list));
-  }
-}
 
 void IR_set_carrier_freq(uint32_t freq)
 {
@@ -242,10 +155,7 @@ void IR_send_bit_data_BI_PHASE(uint8_t LSB_first, uint8_t bit1_high_first, uint8
 }
 
 void IR_decrease(void)
-{
-  if (flash_timer_cnt)
-    flash_timer_cnt--;
-  
+{ 
   if (IR_delay_ms_cnt)
     IR_delay_ms_cnt--;
   
@@ -286,7 +196,7 @@ void IR_send_command(struct IR_item_t *IR_item)
 
 void IR_init(void)
 {
-  IR_read_from_flash();
+  eeprom_load_parameter();
 }
 
 struct  {
@@ -323,12 +233,6 @@ uint8_t ir_index;
 void IR_loop(void)
 { 
   IR_respon_CMD_list_loop();
-  
-  if (flash_flag && flash_timer_cnt == 0)
-  {
-    IR_save_to_flash();
-    flash_flag = 0;
-  }
   
   if (IR_interval_ms_cnt)
   {
@@ -383,9 +287,7 @@ void IR_set_CMD_list(uint8_t index, struct IR_item_t *IR_item)
   if (index < IR_BUFFER_LEN)
   {
     memcpy(&IR_CMD_list[index], IR_item, sizeof(struct IR_item_t));
-    
-    flash_flag = 1;
-    flash_timer_cnt = 500;
+    eeprom_flush();
   }
 }
 

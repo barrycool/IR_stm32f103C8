@@ -37,6 +37,7 @@
 
 /* USER CODE BEGIN 0 */
 #include "IR.h"
+#include "eeprom.h"
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -175,6 +176,7 @@ void SysTick_Handler(void)
   HAL_SYSTICK_IRQHandler();
   /* USER CODE BEGIN SysTick_IRQn 1 */
   IR_decrease();
+  eeprom_decrease();
   /* USER CODE END SysTick_IRQn 1 */
 }
 

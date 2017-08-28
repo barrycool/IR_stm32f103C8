@@ -9,7 +9,7 @@
 #include "IR_RC6.h"
 #include "IR_JVC.h"
 
-#define IR_VERSION 0x20170806
+#define IR_VERSION 0x20170829
 
 #define IR_TIMER_CLOCK 72000000
 
@@ -40,6 +40,9 @@ struct IR_item_t {
   uint8_t is_valid;
   uint32_t delay_time; //ms
 };
+
+#define IR_BUFFER_LEN 20
+extern struct IR_item_t IR_CMD_list[IR_BUFFER_LEN];
 
 void IR_set_carrier_freq(uint32_t freq);
 void enable_ir_tx(void);

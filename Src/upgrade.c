@@ -1,70 +1,30 @@
 #include "upgrade.h"
 #include "crc.h"
+#include "eeprom.h"
+#include "string.h"
 
 struct upgrade_data_t upgrade_data;
 
-static HAL_StatusTypeDef flash_erase(uint32_t addr, uint32_t size)
+static void set_upgrade_status(enum upgrade_status_t upgrade_status)
 {
-  uint32_t PageError;
-  FLASH_EraseInitTypeDef def;
-  HAL_StatusTypeDef status = HAL_ERROR;
+  FLASH_OBProgramInitTypeDef OBInit;
   
-  __disable_interrupt();
+  HAL_FLASHEx_OBGetConfig(&OBInit);
+  OBInit.OptionType |= OPTIONBYTE_DATA;
+  OBInit.DATAAddress = OB_DATA_ADDRESS_DATA0;
+  OBInit.DATAData = upgrade_status;
+  
   HAL_FLASH_Unlock();
+  HAL_FLASH_OB_Unlock();
   
-  __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_OPTVERR);
-  __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_WRPERR | FLASH_FLAG_PGERR);
+  HAL_FLASHEx_OBErase();
+  HAL_FLASHEx_OBProgram(&OBInit);
   
-  def.TypeErase = FLASH_TYPEERASE_PAGES;
-  def.PageAddress = addr;
-  def.NbPages = size / FLASH_PAGE_SIZE;
-  if (def.NbPages * FLASH_PAGE_SIZE < size)
-  {
-    def.NbPages += 1;
-  }
-  def.Banks = FLASH_BANK_1;
-  status = HAL_FLASHEx_Erase(&def, &PageError);
-  
+  HAL_FLASH_OB_Lock();
   HAL_FLASH_Lock();
-  __enable_interrupt();
   
-  return status;
-}
-
-static HAL_StatusTypeDef flash_write(uint32_t addr, uint16_t * data, uint32_t data_len)
-{
-  uint16_t i;
-  HAL_StatusTypeDef status = HAL_ERROR;
-  
-  __disable_interrupt();
-  HAL_FLASH_Unlock();
-  
-  __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_OPTVERR);
-  __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_WRPERR | FLASH_FLAG_PGERR);
-  
-  for (i = 0; i < data_len / 2; i++)
-  {
-    status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, addr + i * 2, data[i]);
-    if (HAL_OK != status)
-      break;
-  }
-  
-  HAL_FLASH_Lock();
-  __enable_interrupt();
-  
-  return status;
-}
-
-static HAL_StatusTypeDef set_upgrade_status(enum upgrade_status_t upgrade_status)
-{
-  HAL_StatusTypeDef status = HAL_ERROR;
-  
-  upgrade_data.upgrade_status = upgrade_status;
-  
-  status = flash_erase(BOOT_LOADER_PARA_ADDR, BOOT_LOADER_PARA_SIZE);
-  status = flash_write(BOOT_LOADER_PARA_ADDR, (uint16_t *)&upgrade_data, sizeof(struct upgrade_data_t));
-  
-  return status;
+  SCB->VTOR = BOOT_LOADER_ADDR;
+  HAL_FLASH_OB_Launch();
 }
 
 uint8_t upgrade_init(void)
@@ -75,7 +35,7 @@ uint8_t upgrade_init(void)
   return 1;
 }
 
-uint8_t upgrade_recv_packet(uint8_t packet_index, uint8_t *data, uint8_t data_len)
+uint8_t upgrade_recv_packet(uint16_t packet_index, uint8_t *data, uint8_t data_len)
 {
   if (flash_write(APP_BACKUP_ADDR + packet_index * PACKET_MAX_SIZE, (uint16_t *)data, data_len) != HAL_OK)
     return 0;
@@ -83,21 +43,30 @@ uint8_t upgrade_recv_packet(uint8_t packet_index, uint8_t *data, uint8_t data_le
   return 1;
 }
 
-
-uint8_t upgrade_finish(uint32_t file_length, uint32_t CRC32)
+uint8_t upgrade_finish(void)
 {
   uint32_t crc32;
+  uint32_t *app_backup_end_addr = (uint32_t *)APP_PARA_ADDR;
+  uint32_t *app_backup_start_addr = (uint32_t *)APP_BACKUP_ADDR;
   
-  crc32 = HAL_CRC_Calculate(&hcrc, (void*)APP_BACKUP_ADDR, file_length / 4);
-  if (crc32 != CRC32)
+  do{
+    app_backup_end_addr--;
+    if (*app_backup_end_addr == UPGRADE_VALID_FLAG)
+    {
+      break;
+    }
+  }while (app_backup_end_addr > app_backup_start_addr);
+  
+  if (app_backup_end_addr <= app_backup_start_addr)
     return 0;
+  
+  memcpy(&upgrade_data, app_backup_end_addr, sizeof(struct upgrade_data_t));
     
-  upgrade_data.upgrade_flag = UPGRADE_VALID_FLAG;
-  upgrade_data.file_length = file_length;
-  upgrade_data.CRC32 = CRC32;
-  
-  if (set_upgrade_status(UPGRADE_INIT) != HAL_OK)
+  crc32 = HAL_CRC_Calculate(&hcrc, (void*)APP_BACKUP_ADDR, upgrade_data.upgrade_fileLength / 4);
+  if (crc32 != upgrade_data.upgrade_crc32)
     return 0;
+  
+  set_upgrade_status(UPGRADE_INIT);
   
   return 1;
 }
