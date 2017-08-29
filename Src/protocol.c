@@ -75,7 +75,8 @@ void receive_data_from_PC(uint8_t *buf, uint8_t buf_len)
 void send_data_to_PC(uint8_t *buf, uint8_t buf_len)
 {
   #if 1
-  while(CDC_Transmit_FS(buf, buf_len) == USBD_BUSY);
+  //while(CDC_Transmit_FS(buf, buf_len) == USBD_BUSY);
+  CDC_Transmit_FS(buf, buf_len);
   #else
   HAL_UART_Transmit(&huart1, buf, buf_len, 50);
   #endif
