@@ -255,6 +255,7 @@ void IR_loop(void)
   
   if (ir_send_status_flag && ir_learning_status && IR_CMD_list[ir_index].is_valid == 0x01)
   { 
+    report_sending_cmd(ir_index);
     IR_send_command(&IR_CMD_list[ir_index]);
     IR_delay_ms_cnt = IR_CMD_list[ir_index].delay_time;
     IR_interval_ms_cnt = 45;

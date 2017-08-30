@@ -22,6 +22,7 @@ enum msg_t {
     START_SEND,
     STOP_LEARNING,
     START_LEARNING,
+    REPORT_SENDING_CMD,
 };
 
 struct frame_t {
@@ -40,5 +41,6 @@ void respon_cmd_list(uint8_t index, struct IR_item_t * ir_item);
 void receive_data_from_PC(uint8_t *buf, uint8_t buf_len);
 void protocol_loop(void);
 void respon_version(uint8_t seq);
+void report_sending_cmd(uint8_t index);
 
 #endif

@@ -290,7 +290,7 @@ void report_receive_ir(uint8_t *ir_data, uint8_t ir_data_len)
   
   frame->header = FRAME_HEADER;
   frame->data_len = sizeof(struct frame_t);
-  frame->seq_num = seq_num;
+  frame->seq_num = seq_num++;
   frame->msg_id = REAL_TIME_RECV;
   
   frame->msg_parameter[0] = ir_data_len;
@@ -300,5 +300,25 @@ void report_receive_ir(uint8_t *ir_data, uint8_t ir_data_len)
   
   buf[frame->data_len] = CRC8(buf, frame->data_len);
   
-  send_data_to_PC(buf, frame->data_len + 1);       
+  send_data_to_PC(buf, frame->data_len + 1);
+}
+
+void report_sending_cmd(uint8_t index)
+{
+  uint8_t buf[256];
+  struct frame_t *frame;
+    
+  frame = (struct frame_t *)buf;
+  
+  frame->header = FRAME_HEADER;
+  frame->data_len = sizeof(struct frame_t);
+  frame->seq_num = seq_num++;
+  frame->msg_id = REPORT_SENDING_CMD;
+  
+  frame->msg_parameter[0] = index;
+  frame->data_len += 1;
+  
+  buf[frame->data_len] = CRC8(buf, frame->data_len);
+  
+  send_data_to_PC(buf, frame->data_len + 1);
 }
