@@ -229,7 +229,8 @@ void IR_respon_CMD_list_loop(void)
 
 volatile uint8_t ir_send_status_flag = 1;
 volatile uint8_t ir_learning_status = 1;
-uint8_t ir_index;
+uint8_t ir_sending_index;
+extern uint8_t eeprom_flush_flag;
 void IR_loop(void)
 { 
   IR_respon_CMD_list_loop();
@@ -253,24 +254,24 @@ void IR_loop(void)
     return;
   }
   
-  if (ir_send_status_flag && ir_learning_status && IR_CMD_list[ir_index].is_valid == 0x01)
-  { 
-    report_sending_cmd(ir_index);
-    IR_send_command(&IR_CMD_list[ir_index]);
-    IR_delay_ms_cnt = IR_CMD_list[ir_index].delay_time;
+  if (ir_send_status_flag && ir_learning_status && eeprom_flush_flag == 0 && IR_CMD_list[ir_sending_index].is_valid == 0x01)
+  {
+    report_sending_cmd(ir_sending_index);
+    IR_send_command(&IR_CMD_list[ir_sending_index]);
+    IR_delay_ms_cnt = IR_CMD_list[ir_sending_index].delay_time;
     IR_interval_ms_cnt = 45;
   }
 
-  if ((++ir_index) >= IR_BUFFER_LEN)
+  if ((++ir_sending_index) >= IR_BUFFER_LEN)
   {
-    ir_index = 0;
+    ir_sending_index = 0;
   }
 }
 
 void IR_send_living_cmd(struct IR_item_t *IR_item)
 {
-  if (IR_item->is_valid)
-    IR_living_CMD = *IR_item;
+  IR_living_CMD = *IR_item;
+  IR_living_CMD.is_valid = 1;
 }
 
 void IR_clear_CMD_list(void)
@@ -281,6 +282,8 @@ void IR_clear_CMD_list(void)
   {
     IR_CMD_list[i].is_valid = 0;
   }
+  
+  eeprom_flush();
 }
 
 void IR_set_CMD_list(uint8_t index, struct IR_item_t *IR_item)

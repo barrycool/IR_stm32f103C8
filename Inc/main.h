@@ -60,7 +60,7 @@
 #define state_LED_GPIO_Port GPIOA
 #define IR_TX_Pin GPIO_PIN_6
 #define IR_TX_GPIO_Port GPIOA
-#define USB_switch_Pin GPIO_PIN_2
+#define USB_switch_Pin GPIO_PIN_10
 #define USB_switch_GPIO_Port GPIOB
 #define IR_RX_Pin GPIO_PIN_6
 #define IR_RX_GPIO_Port GPIOB

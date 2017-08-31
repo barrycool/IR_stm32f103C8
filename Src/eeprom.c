@@ -13,8 +13,8 @@
 #include "eeprom.h"
 #include "upgrade.h"
 
-uint8_t eeprom_flag;
-uint32_t eeprom_timer_cnt;
+uint8_t eeprom_flush_flag;
+uint32_t eeprom_flush_timer_cnt;
 
 HAL_StatusTypeDef flash_erase(uint32_t addr, uint32_t size)
 {
@@ -105,21 +105,23 @@ void eeprom_load_parameter(void)
 
 void eeprom_decrease(void)
 {
-  if (eeprom_timer_cnt)
-    eeprom_timer_cnt--;
+  if (eeprom_flush_timer_cnt)
+    eeprom_flush_timer_cnt--;
 }
 
+extern uint8_t ir_sending_index;
 void eeprom_loop(void)
 { 
-  if (eeprom_flag && eeprom_timer_cnt == 0)
+  if (eeprom_flush_flag && eeprom_flush_timer_cnt == 0)
   {
     eeprom_save_parameter();
-    eeprom_flag = 0;
+    eeprom_flush_flag = 0;
+    ir_sending_index = 0;
   }
 }
 
 void eeprom_flush(void)
 {
-  eeprom_flag = 1;
-  eeprom_timer_cnt = 500;
+  eeprom_flush_flag = 1;
+  eeprom_flush_timer_cnt = 500;
 }
