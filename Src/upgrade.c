@@ -23,6 +23,7 @@ static void set_upgrade_status(enum upgrade_status_t upgrade_status)
   HAL_FLASH_OB_Lock();
   HAL_FLASH_Lock();
   
+  __set_FAULTMASK(1);
   SCB->VTOR = BOOT_LOADER_ADDR;
   HAL_FLASH_OB_Launch();
 }
