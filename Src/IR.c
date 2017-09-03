@@ -45,6 +45,20 @@ struct IR_item_t IR_CMD_list[IR_BUFFER_LEN] = {
   
 };
 
+uint8_t blink_state_led_flag;
+uint32_t blink_state_led_timeout;
+void start_blink_state_led(void)
+{
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  blink_state_led_flag = 1;
+  blink_state_led_timeout = 600;
+}
+
+void stop_blink_state_led(void)
+{
+  HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
+}
+
 void IR_set_carrier_freq(uint32_t freq)
 {
   __HAL_TIM_SET_AUTORELOAD(&TX_TIMER, IR_TIMER_CLOCK / freq);
@@ -161,11 +175,16 @@ void IR_decrease(void)
   
   if (IR_interval_ms_cnt)
     IR_interval_ms_cnt--;
+  
+  if (blink_state_led_timeout)
+    blink_state_led_timeout--;
 }
 
 void IR_send_command(struct IR_item_t *IR_item)
 {
   IR_is_sending_flag = 1;
+  
+  start_blink_state_led();
   
   switch (IR_item->IR_type)
   {
@@ -234,6 +253,12 @@ extern uint8_t eeprom_flush_flag;
 void IR_loop(void)
 { 
   IR_respon_CMD_list_loop();
+  
+  if (blink_state_led_flag && blink_state_led_timeout == 0)
+  {
+    blink_state_led_flag = 0;
+    stop_blink_state_led();
+  }
   
   if (IR_interval_ms_cnt)
   {

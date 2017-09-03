@@ -9,7 +9,7 @@
 #include "IR_RC6.h"
 #include "IR_JVC.h"
 
-#define IR_VERSION 0x20170831
+#define IR_VERSION 0x20170904
 
 #define IR_TIMER_CLOCK 72000000
 
@@ -44,6 +44,7 @@ struct IR_item_t {
 #define IR_BUFFER_LEN 20
 extern struct IR_item_t IR_CMD_list[IR_BUFFER_LEN];
 
+void start_blink_state_led(void);
 void IR_set_carrier_freq(uint32_t freq);
 void enable_ir_tx(void);
 void disable_ir_tx(void);

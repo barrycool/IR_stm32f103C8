@@ -35,6 +35,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
       switch(state)
       {
         case START:
+          start_blink_state_led();
           state = WAIT_RISING;
           WF_index = 0;
           __HAL_TIM_SET_CAPTUREPOLARITY(&RX_TIMER, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
