@@ -16,41 +16,21 @@
 #define TX_TIMER htim3
 
 volatile uint8_t IR_is_sending_flag;
-volatile uint32_t IR_delay_ms_cnt;
-volatile uint16_t IR_interval_ms_cnt;
+uint32_t IR_delay_ms_cnt;
+uint16_t IR_interval_ms_cnt;
 
 struct IR_item_t IR_living_CMD;
-
-//IR TX
-#define IR_DATA_TEST 0
-struct IR_item_t IR_CMD_list[IR_BUFFER_LEN] = {
-  
-#if IR_DATA_TEST == 1
-  {
-    .IR_CMD.IR_SIRCS = {0x10, 0x01, 0x00, 0x12, {'v', 'o', 'l', '_', '+', '\0'}},
-    .IR_type = IR_SONY_SIRCS,
-    .is_valid = 1,
-    .delay_time = 2000,
-  },
-  
-  {
-    .IR_CMD.IR_SIRCS = {0x10, 0x01, 0x00, 0x13, {'v', 'o', 'l', '_', '-', '\0'}},
-    .IR_type = IR_SONY_SIRCS,
-    .is_valid = 1,
-    .delay_time = 2000,
-  },
-#else
-  0
-#endif
-  
-};
+struct IR_item_t IR_CMD_list[IR_BUFFER_LEN];
 
 uint8_t blink_state_led_flag;
 uint32_t blink_state_led_timeout;
 void start_blink_state_led(void)
 {
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-  blink_state_led_flag = 1;
+  if (blink_state_led_flag == 0)
+  {
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+    blink_state_led_flag = 1;
+  }
   blink_state_led_timeout = 600;
 }
 
@@ -222,8 +202,6 @@ struct  {
   uint8_t flag;
   uint8_t index;
 }respon_cmd_list_data;
-
-
 void IR_respon_CMD_list_loop(void)
 {
   if (respon_cmd_list_data.flag)
@@ -235,11 +213,6 @@ void IR_respon_CMD_list_loop(void)
         respon_cmd_list(respon_cmd_list_data.index, &IR_CMD_list[respon_cmd_list_data.index]);
         break;
       }
-    }
-    
-    if (respon_cmd_list_data.index == IR_BUFFER_LEN)
-    {
-    
     }
     
     respon_cmd_list_data.flag = 0;

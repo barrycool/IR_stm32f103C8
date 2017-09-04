@@ -53,3 +53,4 @@ dkms.conf
 /build
 IR_stm32f103C8_HW0_1
 settings
+/EWARM/*.dep
