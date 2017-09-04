@@ -1,1 +1,1 @@
-# IR_stm32f103C8_HW0_1
+# IR_stm32f103C8
