@@ -281,9 +281,10 @@ void ack_msg(uint8_t seq, uint8_t msg_id)
 }
 
 uint8_t seq_num;
+  uint8_t buf[256];
 void report_receive_ir(uint8_t *ir_data, uint8_t ir_data_len)
 {
-  uint8_t buf[256];
+
   struct frame_t *frame;
     
   frame = (struct frame_t *)buf;

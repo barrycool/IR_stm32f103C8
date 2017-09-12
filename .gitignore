@@ -51,6 +51,6 @@ Module.symvers
 Mkfile.old
 dkms.conf
 /build
-IR_stm32f103C8_HW0_1
+IR_stm32f103C8
 settings
 /EWARM/*.dep

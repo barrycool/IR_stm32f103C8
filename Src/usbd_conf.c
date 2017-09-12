@@ -67,7 +67,7 @@ void _Error_Handler(char * file, int line);
 /* USER CODE BEGIN 1 */
 void reset_USB_HW(void)
 {
-  GPIO_InitTypeDef GPIO_InitStruct;
+  /*GPIO_InitTypeDef GPIO_InitStruct;
   
   GPIO_InitStruct.Pin = GPIO_PIN_12;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -81,7 +81,13 @@ void reset_USB_HW(void)
   GPIO_InitStruct.Pin = GPIO_PIN_12;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);*/
+  
+  HAL_GPIO_WritePin(USB_switch_GPIO_Port, USB_switch_Pin, GPIO_PIN_SET);
+  
+  HAL_Delay(500);
+  
+  HAL_GPIO_WritePin(USB_switch_GPIO_Port, USB_switch_Pin, GPIO_PIN_RESET);
 }
 /* USER CODE END 1 */
 void HAL_PCDEx_SetConnectionState(PCD_HandleTypeDef *hpcd, uint8_t state);

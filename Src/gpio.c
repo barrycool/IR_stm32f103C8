@@ -78,7 +78,7 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(USB_switch_GPIO_Port, USB_switch_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(USB_switch_GPIO_Port, USB_switch_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = USB_switch_Pin;

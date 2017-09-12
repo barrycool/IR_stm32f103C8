@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=G:/learn/barry_code/stm32/IR_stm32f103C8_HW0_1/Inc
+HeaderPath=G:/learn/barry_code/stm32/IR_stm32f103C8/Inc
 HeaderFiles=gpio.h;crc.h;tim.h;usb_device.h;usbd_conf.h;usbd_desc.h;usbd_cdc_if.h;stm32f1xx_it.h;stm32f1xx_hal_conf.h;main.h;
-SourcePath=G:/learn/barry_code/stm32/IR_stm32f103C8_HW0_1/Src
+SourcePath=G:/learn/barry_code/stm32/IR_stm32f103C8/Src
 SourceFiles=gpio.h;crc.h;tim.h;usb_device.h;usbd_conf.h;usbd_desc.h;usbd_cdc_if.h;stm32f1xx_it.h;stm32f1xx_hal_conf.h;main.h;gpio.c;crc.c;tim.c;usb_device.c;usbd_conf.c;usbd_desc.c;usbd_cdc_if.c;stm32f1xx_it.c;stm32f1xx_hal_msp.c;main.c;
 
 [PreviousLibFiles]
