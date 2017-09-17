@@ -1008,6 +1008,9 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\Src\IR_JVC.c</name>
+        <excluded>
+          <configuration>IR_stm32f103C8_HW0_1</configuration>
+        </excluded>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Src\IR_JVC.h</name>

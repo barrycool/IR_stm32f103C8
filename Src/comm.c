@@ -40,7 +40,7 @@ void delay_n_0_1_ms(uint8_t time)
   }
 }
 
-void delay_1ms(void)
+/*void delay_1ms(void)
 {
   delay_n_0_1_ms(10);
 }
@@ -53,7 +53,7 @@ void delay_ms(uint32_t time)
   {
     delay_1ms();
   }
-}
+}*/
 
 
 

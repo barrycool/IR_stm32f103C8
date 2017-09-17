@@ -68,10 +68,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   {
      IR_RX_disable();
     
-    //IR_RX_flag = 1;
     report_receive_ir(waveform, WF_index);
-    IR_stop_learning();
+    ir_learning_status = 1;
   }
-  
+  else
+  {
+    IR_RX_disable();
+    __HAL_TIM_SET_CAPTUREPOLARITY(&RX_TIMER, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
+    IR_RX_enable();
+  }
   state = START;
 }

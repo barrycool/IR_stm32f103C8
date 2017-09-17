@@ -9,7 +9,7 @@
 #include "IR_RC6.h"
 #include "IR_JVC.h"
 
-#define IR_VERSION 0x20170912
+#define IR_VERSION 0x20170917
 
 #define IR_TIMER_CLOCK 72000000
 
@@ -62,9 +62,8 @@ void IR_clear_CMD_list(void);
 void IR_set_CMD_list(uint8_t index, struct IR_item_t *IR_item);
 void IR_send_CMD_list(void);
 void IR_send_next_CMD(void);
-void IR_pause_send(void);
-void IR_start_send(void);
-void IR_stop_learning(void);
-void IR_start_learning(void);
+
+extern volatile uint8_t ir_send_status_flag;
+extern volatile uint8_t ir_learning_status;
 
 #endif

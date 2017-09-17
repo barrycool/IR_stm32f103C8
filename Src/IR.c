@@ -1,7 +1,6 @@
 #include "IR.h"
 #include "comm.h"
 #include "tim.h"
-//#include "uart.h"
 #include <string.h>
 #include "protocol.h"
 #include "stm32f1xx_hal.h"
@@ -180,9 +179,9 @@ void IR_send_command(struct IR_item_t *IR_item)
   case IR_TYPE_RC5:
     IR_send_RC5(&IR_item->IR_CMD.IR_RC5);
     break;
-  case IR_TYPE_JVC:
+  /*case IR_TYPE_JVC:
     IR_send_JVC(&IR_item->IR_CMD.IR_JVC);
-    break;
+    break;*/
   case IR_TYPE_LEARNING:
     IR_send_learning(&IR_item->IR_CMD.IR_learning);
     break;
@@ -307,25 +306,3 @@ void IR_send_next_CMD(void)
     respon_cmd_list_data.index++;
   }
 }
-
-void IR_stop_learning(void)
-{
-  ir_learning_status = 1;
-}
-
-void IR_start_learning(void)
-{
-  ir_learning_status = 0;
-}
-
-void IR_pause_send(void)
-{
-  ir_send_status_flag = 0;
-}
-
-void IR_start_send(void)
-{
-  ir_send_status_flag = 1;
-}
-
-

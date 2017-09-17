@@ -5,7 +5,7 @@
 uint8_t IR_TX_WF_buf[128];
 uint8_t IR_TX_WF_buf_len;
 
-uint8_t IR_decode_learning(struct IR_learning_t *IR_learning)
+static uint8_t IR_decode_learning(struct IR_learning_t *IR_learning)
 {
   uint8_t i, j;
   uint8_t diff_cnt = 0;

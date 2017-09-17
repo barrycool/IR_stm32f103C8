@@ -49,6 +49,6 @@ void IR_send_SIRCS(struct IR_SIRCS_t *IR_SIRCS)
   for (i = 0; i < SIRCS_REPETE_CNT; i++)
   {
     IR_send_SIRCS_once(IR_SIRCS);
-    delay_ms(SIRCS_REPETE_INTERVAL);
+    HAL_Delay(SIRCS_REPETE_INTERVAL);
   }
 }
