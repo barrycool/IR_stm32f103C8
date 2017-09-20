@@ -109,7 +109,6 @@ void eeprom_decrease(void)
     eeprom_flush_timer_cnt--;
 }
 
-extern uint8_t ir_sending_index;
 void eeprom_loop(void)
 { 
   if (eeprom_flush_flag && eeprom_flush_timer_cnt == 0)

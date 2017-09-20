@@ -175,6 +175,11 @@ static void cmd_handle(uint8_t *buf, uint8_t buf_len)
       return;
     }
   }
+  else if (frame->msg_id == SET_SEND_IDX)
+  {
+    if (frame->msg_parameter[0] < IR_BUFFER_LEN)
+      ir_sending_index = frame->msg_parameter[0];
+  }
   
   if (frame->msg_id != READ_CMD_LIST && frame->msg_id != ACK &&
       frame->msg_id != NACK && frame->msg_id != READ_MCU_VERSION)

@@ -23,6 +23,7 @@ enum msg_t {
     STOP_LEARNING,
     START_LEARNING,
     REPORT_SENDING_CMD,
+    SET_SEND_IDX,
 };
 
 struct frame_t {
