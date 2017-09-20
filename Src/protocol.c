@@ -127,17 +127,14 @@ static void cmd_handle(uint8_t *buf, uint8_t buf_len)
   }
   else if  (frame->msg_id == PAUSE_SEND)
   {
-    //IR_pause_send();
     ir_send_status_flag = 0;
   }
   else if  (frame->msg_id == START_SEND)
   {
-    //IR_start_send();
     ir_send_status_flag = 1;
   }
   else if  (frame->msg_id == START_LEARNING)
   {
-    //IR_start_learning();
     ir_learning_status = 0;
     IR_RX_enable();
   }
@@ -145,7 +142,6 @@ static void cmd_handle(uint8_t *buf, uint8_t buf_len)
   {
     IR_RX_disable();
     ir_learning_status = 1;
-    //IR_stop_learning();
   }
   else if (frame->msg_id == ACK)
   {
