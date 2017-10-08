@@ -9,7 +9,7 @@
 #include "IR_RC6.h"
 #include "IR_JVC.h"
 
-#define IR_VERSION 0x20171001
+#define IR_VERSION 20171008
 
 #define IR_TIMER_CLOCK 72000000
 
@@ -18,7 +18,7 @@ enum IR_type_t {
   IR_TYPE_NEC,
   IR_TYPE_RC6,
   IR_TYPE_RC5,
-  IR_TYPE_JVC,
+  IR_TYPE_JVC, //delete JVC 20171008
   IR_TYPE_LEARNING,
 
   IR_TYPE_MAX
@@ -29,7 +29,7 @@ union IR_CMD_t{
   struct IR_NEC_t IR_NEC;
   struct IR_RC6_t IR_RC6;
   struct IR_RC5_t IR_RC5;
-  struct IR_JVC_t IR_JVC;
+  //struct IR_JVC_t IR_JVC;
   struct IR_learning_t IR_learning;
 };
 

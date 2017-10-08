@@ -986,16 +986,10 @@
         <name>$PROJ_DIR$\..\Src\comm.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\Src\comm.h</name>
-      </file>
-      <file>
         <name>$PROJ_DIR$\..\Src\crc.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Src\eeprom.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\Src\eeprom.h</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Src\gpio.c</name>
@@ -1004,61 +998,34 @@
         <name>$PROJ_DIR$\..\Src\IR.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\Src\IR.h</name>
-      </file>
-      <file>
         <name>$PROJ_DIR$\..\Src\IR_JVC.c</name>
         <excluded>
           <configuration>IR_stm32f103C8_HW0_1</configuration>
         </excluded>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\Src\IR_JVC.h</name>
-      </file>
-      <file>
         <name>$PROJ_DIR$\..\Src\IR_learning.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\Src\IR_learning.h</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Src\IR_NEC.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\Src\IR_NEC.h</name>
-      </file>
-      <file>
         <name>$PROJ_DIR$\..\Src\IR_RC5.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\Src\IR_RC5.h</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Src\IR_RC6.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\Src\IR_RC6.h</name>
-      </file>
-      <file>
         <name>$PROJ_DIR$\..\Src\IR_RX.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\Src\IR_RX.h</name>
-      </file>
-      <file>
         <name>$PROJ_DIR$\..\Src\IR_sircs.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\Src\IR_sircs.h</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Src\main.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Src\protocol.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\Src\protocol.h</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Src\stm32f1xx_hal_msp.c</name>
@@ -1071,9 +1038,6 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\Src\upgrade.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\Src\upgrade.h</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Src\usb_device.c</name>
