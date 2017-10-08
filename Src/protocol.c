@@ -90,6 +90,7 @@ void IR_ack_handle(uint8_t seq_num, uint8_t msg_id)
   }
 }
 
+uint8_t latest_seq_num;
 static void cmd_handle(uint8_t *buf, uint8_t buf_len)
 {
   struct frame_t *frame; 
@@ -105,6 +106,8 @@ static void cmd_handle(uint8_t *buf, uint8_t buf_len)
   {
     return;
   }
+  
+  latest_seq_num = frame->seq_num;
 
   if (frame->msg_id == REAL_TIME_SEND)
   {

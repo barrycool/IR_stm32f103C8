@@ -201,17 +201,26 @@ struct  {
   uint8_t flag;
   uint8_t index;
 }respon_cmd_list_data;
+uint8_t match_flag;
 void IR_respon_CMD_list_loop(void)
 {
   if (respon_cmd_list_data.flag)
   {
+    match_flag = 0;
+    
     for (;respon_cmd_list_data.index < IR_BUFFER_LEN; respon_cmd_list_data.index++)
     {
       if (IR_CMD_list[respon_cmd_list_data.index].is_valid == 0x01)
       {
         respon_cmd_list(respon_cmd_list_data.index, &IR_CMD_list[respon_cmd_list_data.index]);
+        match_flag = 1;
         break;
       }
+    }
+    
+    if (!match_flag)
+    {
+      nack_msg(latest_seq_num, READ_CMD_LIST);
     }
     
     respon_cmd_list_data.flag = 0;

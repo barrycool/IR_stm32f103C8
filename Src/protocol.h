@@ -34,6 +34,8 @@ struct frame_t {
   uint8_t msg_parameter[0];
 };
 
+extern uint8_t latest_seq_num;
+
 void cmd_handle(uint8_t *buf, uint8_t buf_len);
 void nack_msg(uint8_t seq, uint8_t msg_id);
 void ack_msg(uint8_t seq, uint8_t msg_id);

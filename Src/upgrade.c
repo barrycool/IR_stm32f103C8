@@ -2,6 +2,7 @@
 #include "crc.h"
 #include "eeprom.h"
 #include "string.h"
+#include "protocol.h"
 
 struct upgrade_data_t upgrade_data;
 
@@ -22,6 +23,8 @@ static void set_upgrade_status(enum upgrade_status_t upgrade_status)
   
   HAL_FLASH_OB_Lock();
   HAL_FLASH_Lock();
+  
+  HAL_Delay(500);
   
   __set_FAULTMASK(1);
   SCB->VTOR = BOOT_LOADER_ADDR;
@@ -58,14 +61,16 @@ uint8_t upgrade_finish(void)
     }
   }while (app_backup_end_addr > app_backup_start_addr);
   
-  if (app_backup_end_addr <= app_backup_start_addr)
-    return 0;
-  
   memcpy(&upgrade_data, app_backup_end_addr, sizeof(struct upgrade_data_t));
     
   crc32 = HAL_CRC_Calculate(&hcrc, (void*)APP_BACKUP_ADDR, upgrade_data.upgrade_fileLength / 4);
   if (crc32 != upgrade_data.upgrade_crc32)
+  {
+    nack_msg(latest_seq_num, UPGRADE_FINISH);
     return 0;
+  }
+  
+  ack_msg(latest_seq_num, UPGRADE_FINISH);
   
   set_upgrade_status(UPGRADE_INIT);
   
