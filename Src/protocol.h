@@ -23,6 +23,9 @@ enum msg_t {
     STOP_LEARNING,
     START_LEARNING,
     REPORT_SENDING_CMD,
+    SET_SEND_IDX,       //0x11
+    SEND_CMD_TO_UART,
+    RECV_CMD_FROM_UART,
 };
 
 struct frame_t {
@@ -42,5 +45,6 @@ void receive_data_from_PC(uint8_t *buf, uint8_t buf_len);
 void protocol_loop(void);
 void respon_version(uint8_t seq);
 void report_sending_cmd(uint8_t index);
+void send_uart_to_PC(uint8_t *data, uint8_t data_len);
 
 #endif

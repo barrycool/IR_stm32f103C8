@@ -4,6 +4,7 @@
 #include <string.h>
 #include "IR_RX.h"
 #include "upgrade.h"
+#include "usart.h"
 
 uint32_t CRC32(CRC_HandleTypeDef *hcrc, uint8_t pBuffer[], uint16_t BufferLength)
 {
@@ -74,12 +75,8 @@ void receive_data_from_PC(uint8_t *buf, uint8_t buf_len)
 
 void send_data_to_PC(uint8_t *buf, uint8_t buf_len)
 {
-  #if 1
-  //while(CDC_Transmit_FS(buf, buf_len) == USBD_BUSY);
   CDC_Transmit_FS(buf, buf_len);
-  #else
-  HAL_UART_Transmit(&huart1, buf, buf_len, 50);
-  #endif
+  send_data_to_pc_by_wifi(buf, buf_len);
 }
 
 void IR_ack_handle(uint8_t seq_num, uint8_t msg_id)
@@ -179,6 +176,10 @@ static void cmd_handle(uint8_t *buf, uint8_t buf_len)
       return;
     }
   }
+  else if (frame->msg_id == SEND_CMD_TO_UART)
+  {
+    HAL_UART_Transmit(&huart1, &frame->msg_parameter[1], frame->msg_parameter[0], 500);
+  }
   
   if (frame->msg_id != READ_CMD_LIST && frame->msg_id != ACK &&
       frame->msg_id != NACK && frame->msg_id != READ_MCU_VERSION)
@@ -229,25 +230,6 @@ void send_frame_to_PC(uint8_t msg_id, uint8_t *seq, void *data1, uint8_t data1_l
 
 void respon_version(uint8_t seq)
 {
-  /*uint8_t buf[256];
-  struct frame_t *frame;
-  frame = (struct frame_t *)buf;
-  
-  frame->header = FRAME_HEADER;
-  frame->data_len = sizeof(struct frame_t);
-  frame->seq_num = seq;
-  frame->msg_id = MCU_VERSION;
-  
-  frame->msg_parameter[0] = IR_VERSION & 0xFF;
-  frame->msg_parameter[1] = (IR_VERSION >> 8) & 0xFF;
-  frame->msg_parameter[2] = (IR_VERSION >> 16) & 0xFF;
-  frame->msg_parameter[3] = (IR_VERSION >> 24) & 0xFF;
-  frame->data_len += 4;
-  
-  buf[frame->data_len] = CRC8(buf, frame->data_len);
-
-  send_data_to_PC(buf, frame->data_len + 1);*/
-  
   uint32_t version = IR_VERSION;
   
   send_frame_to_PC(MCU_VERSION, &seq, &version, sizeof(version), NULL, 0);
@@ -255,115 +237,30 @@ void respon_version(uint8_t seq)
 
 void respon_cmd_list(uint8_t index, struct IR_item_t * ir_item)
 {
-  /*uint8_t buf[256];
-  struct frame_t *frame;
-  frame = (struct frame_t *)buf;
-  
-  frame->header = FRAME_HEADER;
-  frame->data_len = sizeof(struct frame_t);
-  frame->seq_num = unique_seq_num++;
-  frame->msg_id = SET_CMD_LIST;
-  
-  frame->msg_parameter[0] = index;
-  frame->data_len += 1;
-  
-  memcpy(frame->msg_parameter + 1, ir_item, sizeof(struct IR_item_t));
-  
-  frame->data_len += sizeof(struct IR_item_t);
-  
-  buf[frame->data_len] = CRC8(buf, frame->data_len);
-
-  send_data_to_PC(buf, frame->data_len + 1);*/
-  
   send_frame_to_PC(SET_CMD_LIST, NULL, &index, sizeof(index), ir_item, sizeof(struct IR_item_t));
 }
 
 void nack_msg(uint8_t seq, uint8_t msg_id)
 {
-  /*uint8_t buf[256];
-  struct frame_t *frame;
-    
-  frame = (struct frame_t *)buf;
-  
-  frame->header = FRAME_HEADER;
-  frame->data_len = sizeof(struct frame_t);
-  frame->seq_num = seq;
-  frame->msg_id = NACK;
-  
-  frame->msg_parameter[0] = msg_id;
-  frame->data_len += 1;
-  
-  buf[frame->data_len] = CRC8(buf, frame->data_len);
-
-  send_data_to_PC(buf, frame->data_len + 1);*/
-  
   send_frame_to_PC(NACK, &seq, &msg_id, sizeof(msg_id), NULL, 0);
 }
 
 void ack_msg(uint8_t seq, uint8_t msg_id)
 {
-  /*uint8_t buf[256];
-  struct frame_t *frame;
-    
-  frame = (struct frame_t *)buf;
-  
-  frame->header = FRAME_HEADER;
-  frame->data_len = sizeof(struct frame_t);
-  frame->seq_num = seq;
-  frame->msg_id = ACK;
-  
-  frame->msg_parameter[0] = msg_id;
-  frame->data_len += 1;
-  
-  buf[frame->data_len] = CRC8(buf, frame->data_len);
-
-  send_data_to_PC(buf, frame->data_len + 1);*/
-  
   send_frame_to_PC(ACK, &seq, &msg_id, sizeof(msg_id), NULL, 0);
 }
 
 void report_receive_ir(uint8_t *ir_data, uint8_t ir_data_len)
 {
-
-  /*struct frame_t *frame;
-    
-  frame = (struct frame_t *)buf;
-  
-  frame->header = FRAME_HEADER;
-  frame->data_len = sizeof(struct frame_t);
-  frame->seq_num = unique_seq_num++;
-  frame->msg_id = REAL_TIME_RECV;
-  
-  frame->msg_parameter[0] = ir_data_len;
-  memcpy(frame->msg_parameter + 1, ir_data, ir_data_len);
-  
-  frame->data_len += 1 + ir_data_len;
-  
-  buf[frame->data_len] = CRC8(buf, frame->data_len);
-  
-  send_data_to_PC(buf, frame->data_len + 1);*/
-  
   send_frame_to_PC(REAL_TIME_RECV, NULL, &ir_data_len, sizeof(ir_data_len), ir_data, ir_data_len);
 }
 
 void report_sending_cmd(uint8_t index)
 {
-  /*uint8_t buf[256];
-  struct frame_t *frame;
-    
-  frame = (struct frame_t *)buf;
-  
-  frame->header = FRAME_HEADER;
-  frame->data_len = sizeof(struct frame_t);
-  frame->seq_num = unique_seq_num++;
-  frame->msg_id = REPORT_SENDING_CMD;
-  
-  frame->msg_parameter[0] = index;
-  frame->data_len += 1;
-  
-  buf[frame->data_len] = CRC8(buf, frame->data_len);
-  
-  send_data_to_PC(buf, frame->data_len + 1);*/
-  
   send_frame_to_PC(REPORT_SENDING_CMD, NULL, &index, sizeof(index), NULL, 0);
+}
+
+void send_uart_to_PC(uint8_t *data, uint8_t data_len)
+{
+  send_frame_to_PC(RECV_CMD_FROM_UART, NULL, data, data_len, NULL, 0);
 }

@@ -38,11 +38,13 @@
 /* USER CODE BEGIN 0 */
 #include "IR.h"
 #include "eeprom.h"
+void HAL_UART_RX_idle_IRQHandler(UART_HandleTypeDef *huart);
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_FS;
 extern TIM_HandleTypeDef htim4;
+extern UART_HandleTypeDef huart1;
 
 /******************************************************************************/
 /*            Cortex-M3 Processor Interruption and Exception Handlers         */ 
@@ -215,7 +217,68 @@ void TIM4_IRQHandler(void)
   /* USER CODE END TIM4_IRQn 1 */
 }
 
-/* USER CODE BEGIN 1 */
+/**
+* @brief This function handles USART1 global interrupt.
+*/
+void USART1_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART1_IRQn 0 */
+  HAL_UART_RX_idle_IRQHandler(&huart1);
+  /* USER CODE END USART1_IRQn 0 */
+  HAL_UART_IRQHandler(&huart1);
+  /* USER CODE BEGIN USART1_IRQn 1 */
 
+  /* USER CODE END USART1_IRQn 1 */
+}
+
+/* USER CODE BEGIN 1 */
+void uart_init(void)
+{
+    __HAL_UART_CLEAR_PEFLAG(&huart1);
+  
+    __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
+    
+    /* Enable the UART Parity Error Interrupt */
+    __HAL_UART_ENABLE_IT(&huart1, UART_IT_PE);
+
+    /* Enable the UART Error Interrupt: (Frame error, noise error, overrun error) */
+    __HAL_UART_ENABLE_IT(&huart1, UART_IT_ERR);
+
+    /* Enable the UART Data Register not empty Interrupt */
+    __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
+}
+
+#include "usart.h"
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+  __HAL_UART_CLEAR_PEFLAG(huart);
+}
+
+void HAL_UART_RX_idle_IRQHandler(UART_HandleTypeDef *huart)
+{
+  if (huart->Instance->SR & (UART_FLAG_NE | UART_FLAG_FE | UART_FLAG_PE | UART_FLAG_ORE))
+  {
+     __HAL_UART_CLEAR_PEFLAG(huart);
+  }
+  
+  if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE))
+  {
+    if (uart_RX_buf_len == 0)
+    {
+      __HAL_UART_CLEAR_PEFLAG(huart);
+    }
+    else
+    {
+      __HAL_UART_CLEAR_IDLEFLAG(huart);
+      uart_RX_flag = 1;
+    }
+  }
+  
+  if (__HAL_UART_GET_FLAG(huart, UART_FLAG_RXNE))
+  {
+    uart_RX_buf[uart_RX_buf_len++] = huart->Instance->DR;
+    __HAL_UART_CLEAR_FLAG(huart, UART_FLAG_RXNE);
+  }
+}
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

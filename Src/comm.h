@@ -9,7 +9,7 @@
 int fputc(int ch, FILE *f);
 */
 
-void delay_n_0_1_ms(uint8_t time);
+void delay_n_0_1_ms(uint16_t time);
 
 /*
 void delay_ms(uint32_t time);
