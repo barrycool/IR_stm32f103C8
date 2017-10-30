@@ -30,11 +30,16 @@ void delay_0_1_ms(void)
   __HAL_TIM_DISABLE(&htim1);
 }
 
-void delay_n_0_1_ms(uint8_t time)
+void delay_n_0_1_ms(uint16_t time)
 {
-  uint8_t i;
+  /*uint8_t i;
   
   for (i = 0; i < time; i++)
+  {
+    delay_0_1_ms();
+  }*/
+  
+  while(time--)
   {
     delay_0_1_ms();
   }

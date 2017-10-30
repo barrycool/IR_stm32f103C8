@@ -50,6 +50,7 @@
 #include "stm32f1xx_hal.h"
 #include "crc.h"
 #include "tim.h"
+#include "usart.h"
 #include "usb_device.h"
 #include "gpio.h"
 
@@ -106,6 +107,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART1_UART_Init();
   MX_CRC_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
@@ -114,7 +116,9 @@ int main(void)
   MX_USB_DEVICE_Init();
 
   /* USER CODE BEGIN 2 */
+  uart_init();
   IR_init();
+  uart_config_wifi();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -124,6 +128,7 @@ int main(void)
     IR_loop();
     protocol_loop();
     eeprom_loop();
+    uart_loop();
 
   /* USER CODE END WHILE */
 
