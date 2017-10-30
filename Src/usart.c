@@ -166,8 +166,6 @@ void uart_loop()
   {
     uart_RX_buf[uart_RX_buf_len++] = 0;
     
-    //send_uart_to_PC(uart_RX_buf, uart_RX_buf_len);
-    
     if ((ret = strstr((char*)uart_RX_buf, "+IPD")) && ret < (char*)uart_RX_buf + uart_RX_buf_len)
     {
       sscanf(ret, "+IPD,%hhd,%hhd", &last_client_id, &last_data_len);     
@@ -185,10 +183,6 @@ void uart_loop()
       
       receive_data_from_PC(last_data, last_data_len);
     }
-    else if ((ret = strstr((char*)uart_RX_buf, "CWSAP_DEF")) && ret < (char*)uart_RX_buf + uart_RX_buf_len)
-    {
-      send_uart_to_PC(uart_RX_buf, uart_RX_buf_len);
-    }
     else if ((ret = strstr((char*)uart_RX_buf, ",CONNECT")) && ret < (char*)uart_RX_buf + uart_RX_buf_len)
     {
       b_is_connected = 1;
@@ -196,6 +190,10 @@ void uart_loop()
     else if ((ret = strstr((char*)uart_RX_buf, ",CLOSED")) && ret < (char*)uart_RX_buf + uart_RX_buf_len)
     {
       b_is_connected = 0;
+    }
+    else if ((ret = strstr((char*)uart_RX_buf, "CWSAP_DEF")) && ret < (char*)uart_RX_buf + uart_RX_buf_len)
+    {
+      send_uart_to_PC(uart_RX_buf, uart_RX_buf_len);
     }
 
  uart_loop_end:
