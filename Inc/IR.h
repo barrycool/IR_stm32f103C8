@@ -9,7 +9,7 @@
 #include "IR_RC6.h"
 #include "IR_JVC.h"
 
-#define IR_VERSION 0x20171011
+#define IR_VERSION 0x20171031
 
 #define IR_TIMER_CLOCK 72000000
 
