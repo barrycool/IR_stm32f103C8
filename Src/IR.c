@@ -251,7 +251,7 @@ void IR_loop(void)
     IR_send_command(&IR_living_CMD);
     
     IR_living_CMD.is_valid = 0;
-    IR_interval_ms_cnt = 45;
+    IR_interval_ms_cnt = 10;
     return;
   }
   
@@ -265,7 +265,7 @@ void IR_loop(void)
     report_sending_cmd(ir_sending_index);
     IR_send_command(&IR_CMD_list[ir_sending_index]);
     IR_delay_ms_cnt = IR_CMD_list[ir_sending_index].delay_time;
-    IR_interval_ms_cnt = 45;
+    IR_interval_ms_cnt = 10;
   }
 
   if ((++ir_sending_index) >= IR_BUFFER_LEN)
