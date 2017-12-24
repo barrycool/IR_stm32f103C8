@@ -10,6 +10,9 @@
 #define NEC_START_BIT_HIGH  90
 #define NEC_START_BIT_LOW  45
 
+#define NEC_REPEATE_START_BIT_HIGH  90
+#define NEC_REPEATE_START_BIT_LOW  23
+
 #define NEC_BIT1_HIGH  6
 #define NEC_BIT1_LOW  17
 
@@ -27,6 +30,6 @@ struct IR_NEC_t {
   char name[16];
 };
 
-void IR_send_NEC(struct IR_NEC_t *IR_NEC);
+void IR_send_NEC(struct IR_NEC_t *IR_NEC, uint8_t repeate_mode);
 
 #endif

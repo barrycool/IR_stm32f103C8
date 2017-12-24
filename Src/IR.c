@@ -16,7 +16,8 @@
 
 volatile uint8_t IR_is_sending_flag;
 uint32_t IR_delay_ms_cnt;
-uint16_t IR_interval_ms_cnt;
+
+volatile uint32_t jiffies;
 
 struct IR_item_t IR_living_CMD;
 struct IR_item_t IR_CMD_list[IR_BUFFER_LEN];
@@ -148,18 +149,17 @@ void IR_send_bit_data_BI_PHASE(uint8_t LSB_first, uint8_t bit1_high_first, uint8
 }
 
 void IR_decrease(void)
-{ 
+{
+  ++jiffies;
+  
   if (IR_delay_ms_cnt)
     IR_delay_ms_cnt--;
-  
-  if (IR_interval_ms_cnt)
-    IR_interval_ms_cnt--;
   
   if (blink_state_led_timeout)
     blink_state_led_timeout--;
 }
 
-void IR_send_command(struct IR_item_t *IR_item)
+void IR_send_command(struct IR_item_t *IR_item, uint8_t repeate_mode)
 {
   IR_is_sending_flag = 1;
   
@@ -171,7 +171,7 @@ void IR_send_command(struct IR_item_t *IR_item)
     IR_send_SIRCS(&IR_item->IR_CMD.IR_SIRCS);
     break;
   case IR_TYPE_NEC:
-    IR_send_NEC(&IR_item->IR_CMD.IR_NEC);
+    IR_send_NEC(&IR_item->IR_CMD.IR_NEC, repeate_mode);
     break;
   case IR_TYPE_RC6:
     IR_send_RC6(&IR_item->IR_CMD.IR_RC6);
@@ -227,12 +227,16 @@ void IR_respon_CMD_list_loop(void)
   }
 }
 
+extern uint8_t eeprom_flush_flag;
+
 volatile uint8_t ir_send_status_flag = 1;
 volatile uint8_t ir_learning_status = 1;
 uint8_t ir_sending_index;
-extern uint8_t eeprom_flush_flag;
+uint8_t ir_last_sending_index = 0xFF;
+uint8_t ir_last_sending_jiffies;
+
 void IR_loop(void)
-{ 
+{
   IR_respon_CMD_list_loop();
   
   if (blink_state_led_flag && blink_state_led_timeout == 0)
@@ -240,18 +244,13 @@ void IR_loop(void)
     blink_state_led_flag = 0;
     stop_blink_state_led();
   }
-  
-  if (IR_interval_ms_cnt)
-  {
-    return;
-  }
-  
+
   if (IR_living_CMD.is_valid == 0x01)
   {
-    IR_send_command(&IR_living_CMD);
+    IR_send_command(&IR_living_CMD, 0);
     
     IR_living_CMD.is_valid = 0;
-    IR_interval_ms_cnt = 10;
+    ir_last_sending_index = 0xFF;
     return;
   }
   
@@ -263,9 +262,11 @@ void IR_loop(void)
   if (ir_send_status_flag && ir_learning_status && eeprom_flush_flag == 0 && IR_CMD_list[ir_sending_index].is_valid == 0x01)
   {
     report_sending_cmd(ir_sending_index);
-    IR_send_command(&IR_CMD_list[ir_sending_index]);
+    IR_send_command(&IR_CMD_list[ir_sending_index], (ir_sending_index == ir_last_sending_index) && (jiffies - ir_last_sending_jiffies < 120));
     IR_delay_ms_cnt = IR_CMD_list[ir_sending_index].delay_time;
-    IR_interval_ms_cnt = 10;
+    
+    ir_last_sending_index = ir_sending_index;
+    ir_last_sending_jiffies = jiffies;
   }
 
   if ((++ir_sending_index) >= IR_BUFFER_LEN)
