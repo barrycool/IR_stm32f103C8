@@ -233,7 +233,7 @@ volatile uint8_t ir_send_status_flag = 1;
 volatile uint8_t ir_learning_status = 1;
 uint8_t ir_sending_index;
 uint8_t ir_last_sending_index = 0xFF;
-uint8_t ir_last_sending_jiffies;
+uint32_t ir_last_sending_jiffies;
 
 void IR_loop(void)
 {
